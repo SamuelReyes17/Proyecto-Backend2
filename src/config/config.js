@@ -1,6 +1,6 @@
 import passport from "passport";
-import { registerLocal, loginLocal } from "./local.strategy.js";
-import userModel from "../../models/user.model.js";
+import { registerLocal, loginLocal } from "./strategies.js";
+import userModel from "../models/user.model.js";
 
 const initializedPassport = () => {
   // Estrategias

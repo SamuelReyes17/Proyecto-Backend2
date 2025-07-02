@@ -15,7 +15,7 @@ router.get("/register", (req, res) => {
 });
 
 router.get("/profile", (req, res) => {
-  const { fisrt_name, last_name, age, role } = req.user;
+  const { first_name, last_name, age, role } = req.user;
   res.render("profile", { fisrt_name, last_name, age, role });
 });
 

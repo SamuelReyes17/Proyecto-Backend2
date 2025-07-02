@@ -58,7 +58,7 @@ app.listen(PORT, () => {
 
 // Conexión a Mongo
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, { dbName: "Backend2" })
   .then(() => console.log("Mongo connection success"))
   .catch((er) => {
     console.log("Error Mongoose Connect");

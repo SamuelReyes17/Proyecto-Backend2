@@ -1,64 +1,51 @@
 import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import UserModel from "../models/user.model.js";
+import local from "passport-local";
+import userModel from "../models/user.model.js";
 import { createHash, isValidPassword } from "../utils/encryption.js";
-import dotenv from "dotenv";
 
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET;
+const LocalStragety = local.Strategy;
 
-passport.use(
-  "register",
-  new LocalStrategy(
-    { passReqToCallback: true, usernameField: "email" },
-    async (req, email, password, done) => {
-      try {
-        const user = await UserModel.findOne({ email });
-        if (user) return done(null, false);
-        const newUser = await UserModel.create({
-          ...req.body,
-          password: createHash(password),
-        });
-        return done(null, newUser);
-      } catch (err) {
-        return done(err);
+const initializePassport = () => {
+  passport.use(
+    "register",
+    new LocalStragety(
+      { passReqToCallback: true, usernameField: "email" },
+      async (req, email, password, done) => {
+        const { first_name, last_name, age, avatar } = req.body;
+        try {
+          let userFound = await userModel.findOne({ email });
+
+          if (userFound) {
+            console.error("User already exists");
+            return done(null, false);
+          }
+
+          const newUser = {
+            first_name,
+            last_name,
+            email,
+            age,
+            password: createHash(password),
+            avatar,
+          };
+
+          const user = await userModel.create(newUser);
+          return done(null, user);
+        } catch (err) {
+          done(err);
+        }
       }
-    }
-  )
-);
+    )
+  );
 
-passport.use(
-  "login",
-  new LocalStrategy(
-    { usernameField: "email" },
-    async (email, password, done) => {
-      try {
-        const user = await UserModel.findOne({ email });
-        if (!user || !isValidPassword(user, password)) return done(null, false);
-        return done(null, user);
-      } catch (err) {
-        return done(err);
-      }
-    }
-  )
-);
+  passport.serializeUser((user, done) => {
+    done(null, user._id);
+  });
 
-passport.use(
-  "jwt",
-  new JwtStrategy(
-    {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: JWT_SECRET,
-    },
-    async (payload, done) => {
-      try {
-        const user = await UserModel.findById(payload.id);
-        if (!user) return done(null, false);
-        return done(null, user);
-      } catch (err) {
-        return done(err);
-      }
-    }
-  )
-);
+  passport.deserializeUser(async (id, done) => {
+    let user = await userModel.findById(id);
+    done(null, user);
+  });
+};
+
+export default initializePassport;
