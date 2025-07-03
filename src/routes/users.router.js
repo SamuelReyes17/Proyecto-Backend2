@@ -4,7 +4,8 @@ import userModel from "../models/user.model.js";
 const router = Router();
 
 router.get("/", async (_, res) => {
-  res.json(await userModel.find());
+  console.log("entreeeee");
+  //res.json(await userModel.find());
 });
 
 router.get("/:id", async (req, res) => {

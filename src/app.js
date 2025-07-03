@@ -3,6 +3,7 @@ import hbs from "express-handlebars";
 import session from "express-session";
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
+import cookieParser from "cookie-parser";
 
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -25,7 +26,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //Session
-app.use(
+app.use(cookieParser);
+/*app.use(
   session({
     store: MongoStore.create({
       mongoUrl: MONGO_URI,
@@ -41,12 +43,15 @@ app.use(
       maxAge: 2 * 60 * 60 * 1000,
     },
   })
-);
-initializePassport();
+);*/
+initializePassport(passport);
 app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
+app.get("/", (req, res) => {
+  console.log("prueba");
+  res.json("message");
+});
 app.use("/", viewsRouter);
 app.use("/api/session", sessionRouter);
 app.use("/api/users", usersRouter);

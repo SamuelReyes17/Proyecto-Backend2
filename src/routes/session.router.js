@@ -1,23 +1,19 @@
 import { Router } from "express";
 import passport from "passport";
-
+import jwt from "jsonwebtoken";
+import env from "../config/index.js";
 const router = Router();
 
-router.post(
-  "/register",
-  passport.authenticate("register", {
-    successRedirect: "/login",
-    failureRedirect: "/failed",
-  })
-);
+router.post("/register", passport.authenticate("create"), (req, res) => {
+  const payload = { email: req.email };
+  const token = jwt.sign(payload, env.JWT_SECRET, { expiresIn: "5m" });
+  res.cookie("accesToken", token, { httpOnly: true });
+  console.log("entre");
+});
 
-router.post(
-  "/login",
-  passport.authenticate("login", {
-    successRedirect: "/profile",
-    failureRedirect: "/failed",
-  })
-);
+router.post("/login", (req, res) => {
+  console.log("login");
+});
 
 router.post("/logout", (req, res) => {
   req.logout((err) => {
