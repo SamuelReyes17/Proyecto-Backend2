@@ -23,8 +23,8 @@ const userSchema = new mongoose.Schema({
   },
   cart: {
     type: Schema.Types.ObjectId,
-    required: true,
-    unique: true,
+    required: false,
+    unique: false,
   },
   password: {
     type: String,

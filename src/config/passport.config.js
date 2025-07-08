@@ -54,10 +54,12 @@ function initializePassport(passport) {
     jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
   };
   passport.use(
-    "getRegister",
+    "jwt",
     new JwtStrategy(options, async (payload, done) => {
+      console.log("hola desde jstrategy");
       const email = payload.email;
       const userFound = await userModel.findOne({ email: email });
+      console.log(email);
       if (userFound) {
         return done(null, payload.email);
       } else {
@@ -65,45 +67,14 @@ function initializePassport(passport) {
       }
     })
   );
-  passport.use(
-    "create",
-    new LocalStrategy(
-      { passReqToCallback: true, usernameField: "email" },
-      async (req, email, password, done) => {
-        console.log("entre");
-        const { first_name, last_name, age, avatar } = req.body;
-        try {
-          let userFound = await userModel.findOne({ email });
-
-          if (userFound) {
-            console.error("User already exists");
-            return done(null, false);
-          }
-
-          const newUser = {
-            first_name,
-            last_name,
-            email,
-            age,
-            password: createHash(password),
-            avatar,
-          };
-
-          const user = await userModel.create(newUser);
-          return done(null, user);
-        } catch (err) {
-          done(err);
-        }
-      }
-    )
-  );
 }
 
 function cookieExtractor(req) {
   let token = null;
   if (req && req.cookies) {
-    token = req.cookies["acces_token"];
+    token = req.cookies["access_token"];
   }
+  console.log(token);
   return token;
 }
 export default initializePassport;

@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //Session
-app.use(cookieParser);
+app.use(cookieParser());
 /*app.use(
   session({
     store: MongoStore.create({
